@@ -15,6 +15,14 @@ from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_groq import ChatGroq
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA
+from langchain.document_loaders import PyPDFLoader, DirectoryLoader
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 # ---------- Config ----------
 APP_TITLE = "Gita Mind"

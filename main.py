@@ -60,7 +60,7 @@ class RAGBackend:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         texts = text_splitter.split_documents(documents)
 
-        embeddings = HuggingFaceBgeEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
+        embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
         vector_db = FAISS.from_documents(texts, embeddings)
         vector_db.save_local(db_path)
         return vector_db

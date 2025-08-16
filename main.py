@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 # --- LangChain & LLM imports ---
 from langchain_groq import ChatGroq
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
@@ -48,7 +48,7 @@ class RAGBackend:
         if not os.path.exists(db_path):
             self.vector_db = self.create_vector_db(pdf_folder_path, db_path)
         else:
-            embeddings = HuggingFaceBgeEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
+            embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
             self.vector_db = FAISS.load_local(db_path, embeddings, allow_dangerous_deserialization=True)
 
         self.qa_chain = self.setup_qa_chain(self.vector_db, self.llm)

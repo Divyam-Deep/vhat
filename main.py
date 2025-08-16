@@ -6,7 +6,7 @@ import streamlit as st
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
-# --- LangChain & LLM imports from your code ---
+# --- LangChain & LLM imports ---
 from langchain_groq import ChatGroq
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader
@@ -19,7 +19,6 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 # ---------- Config ----------
 APP_TITLE = "Gita Mind"
 APP_SUBTITLE = "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।<br> मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि ॥<br><br>"
-
 
 # Load .env for keys if present
 load_dotenv()
@@ -34,7 +33,7 @@ class Message(BaseModel):
     role: str  # "user" | "assistant"
     content: str
 
-# ---------- Backend with your code wired ----------
+# ---------- Backend ----------
 class RAGBackend:
     def __init__(self):
         self.llm = ChatGroq(
@@ -43,30 +42,27 @@ class RAGBackend:
             model_name="llama-3.3-70b-versatile"
         )
 
-        db_path = "./chroma_db"
+        db_path = "./faiss_db"
         pdf_folder_path = "./guru"  # Put your Bhagavad Gita PDFs here
 
         if not os.path.exists(db_path):
-            self.vector_db = self.create_vector_db(pdf_folder_path)
+            self.vector_db = self.create_vector_db(pdf_folder_path, db_path)
         else:
             embeddings = HuggingFaceBgeEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
-            self.vector_db = FAISS.from_documents(
-            documents=docs,
-            embedding=embeddings
-    )
+            self.vector_db = FAISS.load_local(db_path, embeddings, allow_dangerous_deserialization=True)
 
         self.qa_chain = self.setup_qa_chain(self.vector_db, self.llm)
         self.analyzer = SentimentIntensityAnalyzer()
 
-    def create_vector_db(self, pdf_folder_path):
+    def create_vector_db(self, pdf_folder_path, db_path):
         loader = DirectoryLoader(pdf_folder_path, glob='*.pdf', loader_cls=PyPDFLoader)
         documents = loader.load()
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         texts = text_splitter.split_documents(documents)
 
         embeddings = HuggingFaceBgeEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
-        vector_db = Chroma.from_documents(texts, embeddings, persist_directory='./chroma_db')
-        vector_db.persist()
+        vector_db = FAISS.from_documents(texts, embeddings)
+        vector_db.save_local(db_path)
         return vector_db
 
     def setup_qa_chain(self, vector_db, llm):
@@ -131,9 +127,6 @@ st.set_page_config(page_title=APP_TITLE, page_icon="🧘", layout="wide")
 init_session_state()
 backend = RAGBackend()
 
-# st.title(APP_TITLE)
-# st.caption(APP_SUBTITLE)
-
 # Background image
 page_bg = """
 <style>
@@ -150,9 +143,9 @@ page_bg = """
 """
 st.markdown(page_bg, unsafe_allow_html=True)
 
-# Centered title
+# Title
 st.markdown(
-    f"<h1 style='text-align:center; font-size: 40px; color:white; margin-left:20px; text-shadow:2px 2px 4px black;'>{APP_TITLE}</h1>",
+    f"<h1 style='text-align:center; font-size: 40px; color:white; text-shadow:2px 2px 4px black;'>{APP_TITLE}</h1>",
     unsafe_allow_html=True
 )
 st.markdown(
@@ -160,48 +153,29 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-# # Audio player with mute toggle
-# try:
-#     audio_file = open("bg/music.mp3", "rb")
-#     audio_bytes = audio_file.read()
-#     col1, col2 = st.columns([9,1])
-#     with col2:
-#         if st.button("🔇" if not st.session_state.mute else "🔊"):
-#             st.session_state.mute = not st.session_state.mute
-#     if not st.session_state.mute:
-#         st.audio(audio_bytes, format="audio/mp3", autoplay=True)
-# except FileNotFoundError:
-#     st.warning("No background music file found at ./bg/music.mp3")
-
-#Display past messages
+# Display past messages
 for m in st.session_state.messages:
     with st.chat_message(m["role"]):
         st.markdown(m["content"])
 
+# Chat input
 user_input = st.chat_input("Ask a question inspired by Bhagavad Gita…")
 if user_input:
-    # ✅ Show user input immediately
     with st.chat_message("user"):
         st.markdown(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    # 🧠 Get chat history (excluding new message)
     history_objs = [Message(role=m["role"], content=m["content"]) for m in st.session_state.messages]
 
     with st.chat_message("assistant"):
         try:
             sentiment, response, sources = backend.answer(query=user_input, history=history_objs)
 
-            # Show sentiment (optional, but nice)
             sentiment_line = f"I detected your sentiment as **{sentiment}**."
             st.markdown(sentiment_line)
             st.session_state.messages.append({"role": "assistant", "content": sentiment_line})
 
-            # ✅ Stream final response using st.empty()
             final_text = stream_text(response)
-
-            # ✅ Only add it after streaming completes
             st.session_state.messages.append({"role": "assistant", "content": final_text})
 
         except Exception as e:

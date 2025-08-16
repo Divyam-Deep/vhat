@@ -15,3 +15,14 @@ pypdf>=3.17.4
 
 # Sentiment analysis
 vaderSentiment>=3.3.2
+
+langchain
+langchain-community
+langchain-groq
+streamlit
+pydantic
+python-dotenv
+chromadb
+sentence-transformers
+vaderSentiment
+nltk

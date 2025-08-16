@@ -4,18 +4,18 @@ python-dotenv==1.0.1
 pydantic==2.5.0
 
 # LangChain ecosystem
-langchain==0.1.15
-langchain-community==0.0.19
+langchain==0.3.7
+langchain-community==0.3.27
 langchain-groq==0.0.2
 
 # Embeddings + Vector DB
-sentence-transformers==2.5.1
+sentence-transformers==3.0.1
 faiss-cpu==1.7.4
-chromadb==0.4.22
+chromadb==0.5.5
 
 # PDF loader
-pypdf==3.17.4
+pypdf==4.2.0
 
 # Sentiment analysis
 vaderSentiment==3.3.2
-nltk==3.8.1
+nltk==3.9.1

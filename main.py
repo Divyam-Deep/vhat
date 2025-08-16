@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 # --- LangChain & LLM imports ---
 from langchain_groq import ChatGroq
-from langchain_community.embeddings import SentenceTransformerEmbeddings
+from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA

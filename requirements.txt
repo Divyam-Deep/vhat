@@ -1,10 +1,21 @@
-streamlit
-pydantic
-python-dotenv
-langchain
-langchain-community
-langchain-groq
-sentence-transformers
-faiss-cpu
-vaderSentiment
-PyPDF2
+# Streamlit
+streamlit>=1.32.0
+python-dotenv>=1.0.1
+pydantic>=2.5.0
+
+# LangChain ecosystem
+langchain>=0.1.15
+langchain-community>=0.0.19
+langchain-groq>=0.0.2
+
+# Embeddings + Vector DB
+sentence-transformers>=2.5.1
+chromadb>=0.4.22
+faiss-cpu>=1.7.4
+
+# PDF loader
+pypdf>=3.17.4
+
+# Sentiment analysis
+vaderSentiment>=3.3.2
+nltk

@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -50,7 +50,10 @@ class RAGBackend:
             self.vector_db = self.create_vector_db(pdf_folder_path)
         else:
             embeddings = HuggingFaceBgeEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
-            self.vector_db = Chroma(persist_directory=db_path, embedding_function=embeddings)
+            self.vector_db = FAISS.from_documents(
+            documents=docs,
+            embedding=embeddings
+    )
 
         self.qa_chain = self.setup_qa_chain(self.vector_db, self.llm)
         self.analyzer = SentimentIntensityAnalyzer()

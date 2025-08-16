@@ -11,7 +11,6 @@ from langchain_community.vectorstores import Chroma
 from langchain_groq import ChatGroq
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader
-from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter

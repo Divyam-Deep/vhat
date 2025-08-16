@@ -8,8 +8,8 @@ langchain-groq>=0.0.2
 
 # Embeddings + Vector DB
 sentence-transformers>=2.5.1
-chromadb==0.5.0
-duckdb==0.9.2
+chromadb>=0.4.22
+
 # PDF loader
 pypdf>=3.17.4
 
